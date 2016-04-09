@@ -1,9 +1,11 @@
 package com.justinross.caloriescounter;
 
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +14,7 @@ import android.widget.Toast;
 
 import com.justinross.caloriecounter.R;
 
+import data.DatabaseHandler;
 import model.Food;
 
 public class FoodItemDetails extends AppCompatActivity {
@@ -19,6 +22,7 @@ public class FoodItemDetails extends AppCompatActivity {
     private TextView foodName, calories, dateTaken;
     private Button shareButton;
     private int foodId;
+    private Button deleteButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +33,8 @@ public class FoodItemDetails extends AppCompatActivity {
         calories = (TextView) findViewById(R.id.detscaloriesValue);
         dateTaken = (TextView) findViewById(R.id.detsDateText);
         shareButton = (Button) findViewById(R.id.detsShareButton);
+
+        deleteButton = (Button) findViewById(R.id.deleteButton);
 
 
 
@@ -52,8 +58,42 @@ public class FoodItemDetails extends AppCompatActivity {
             }
         });
 
+        deleteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //TODO: put delete functionality here
+                AlertDialog.Builder alert = new AlertDialog.Builder(FoodItemDetails.this);
+                alert.setTitle("Delete?");
+                alert.setMessage("Are you sure you want to delete this item?");
+                alert.setNegativeButton("No", null);
+                alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        DatabaseHandler dba = new DatabaseHandler(getApplicationContext());
+                        dba.deleteFood(foodId);
+
+                        Toast.makeText(FoodItemDetails.this, "Food Item Deleted!", Toast.LENGTH_SHORT).show();
+
+                        startActivity(new Intent(FoodItemDetails.this, DisplayFoodsActivity.class));
+
+                        //remove this activity from activity stack
+                        FoodItemDetails.this.finish();
+
+                    }
+                });
+
+                alert.show();
+
+            }
+        });
+
 
     }
+
+
+
+
 
     public void shareCals() {
 
